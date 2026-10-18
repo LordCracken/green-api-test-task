@@ -7,12 +7,6 @@ export function normalizePhone(input: string): string | null {
   return digits.length >= 10 && digits.length <= 15 ? digits : null
 }
 
-// Имя пользователя Telegram: 5–32 символа, латиница, цифры и «_»
-export function normalizeUsername(input: string): string | null {
-  const username = input.trim().replace(/^@/, '')
-  return /^[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(username) ? `@${username}` : null
-}
-
 export function formatPhone(digits: string): string {
   if (digits.length === 11 && digits.startsWith('7')) {
     return `+7 ${digits.slice(1, 4)} ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9)}`

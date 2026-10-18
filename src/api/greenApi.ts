@@ -80,7 +80,7 @@ export function getStateInstance(credentials: Credentials) {
 }
 
 type CheckAccountResponse =
-  | { exist: boolean; chatId: string; username?: string; phoneNumber?: number }
+  | { exist: boolean; chatId: string }
   | { status: false; reason?: string; data?: { reason?: string } }
 
 const CHECK_ACCOUNT_REASONS: Record<string, string> = {
@@ -90,12 +90,10 @@ const CHECK_ACCOUNT_REASONS: Record<string, string> = {
   'Messenger is temporarily unavailable': 'Серверы Telegram недоступны. Попробуйте через несколько минут',
 }
 
-export type CheckAccountQuery = { phoneNumber: string } | { username: string }
-
-export async function checkAccount(credentials: Credentials, query: CheckAccountQuery) {
+export async function checkAccount(credentials: Credentials, phoneNumber: string) {
   const result = await request<CheckAccountResponse>(credentials, 'checkAccount', {
     httpMethod: 'POST',
-    body: 'phoneNumber' in query ? { phoneNumber: Number(query.phoneNumber) } : query,
+    body: { phoneNumber: Number(phoneNumber) },
   })
   if ('status' in result && result.status === false) {
     const reason = result.reason ?? result.data?.reason ?? ''

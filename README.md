@@ -7,7 +7,7 @@
 ## Возможности
 
 1. Вход по учётным данным инстанса GREEN-API: `idInstance` и `apiTokenInstance`.
-2. Создание чата по номеру телефона получателя (или по `@username`).
+2. Создание чата по номеру телефона получателя.
 3. Отправка текстовых сообщений методом [SendMessage](https://green-api.com/telegram/docs/api/sending/SendMessage/).
 4. Получение ответов через [HTTP API](https://green-api.com/telegram/docs/api/receiving/technology-http-api/): `ReceiveNotification` + `DeleteNotification`.
 5. Статусы исходящих сообщений: отправляется, отправлено, доставлено, прочитано, ошибка.

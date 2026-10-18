@@ -59,7 +59,7 @@ export function Sidebar({
       <ul className="chat-list">
         {items.length === 0 && (
           <li className="chat-list__empty">
-            Введите номер телефона или @username получателя, чтобы начать переписку
+            Введите номер телефона получателя, чтобы начать переписку
           </li>
         )}
         {items.map(({ chat, last }) => (

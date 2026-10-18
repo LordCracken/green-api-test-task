@@ -26,7 +26,7 @@ export function ChatView({ chat, messages, onSend, onBack }: ChatViewProps) {
       <section className="chat chat--empty">
         <div className="chat__placeholder">
           <ChatBubbleIcon width={48} height={48} />
-          <p>Выберите чат или создайте новый по номеру телефона или @username</p>
+          <p>Выберите чат или создайте новый по номеру телефона</p>
         </div>
       </section>
     )
