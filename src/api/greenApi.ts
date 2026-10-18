@@ -88,7 +88,7 @@ export async function checkAccount(credentials: Credentials, phoneNumber: string
     httpMethod: 'POST',
     body: { phoneNumber: Number(phoneNumber) },
   })
-  if ('status' in result && result.status === false) {
+  if ('status' in result && !result.status) {
     const reason = result.reason ?? result.data?.reason ?? ''
     throw new Error(CHECK_ACCOUNT_REASONS[reason] ?? (reason || 'Не удалось проверить аккаунт'))
   }
