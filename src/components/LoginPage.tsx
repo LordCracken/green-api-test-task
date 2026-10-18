@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { getStateInstance } from '../api/greenApi'
 import type { Credentials } from '../types'
 import { PaperPlaneIcon } from './icons'
@@ -22,7 +22,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const credentials: Credentials = {
       idInstance: idInstance.trim(),

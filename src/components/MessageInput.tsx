@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useState, type SubmitEvent, type KeyboardEvent } from 'react'
 import { SendIcon } from './icons'
 
 // Ограничение метода SendMessage
@@ -18,7 +18,7 @@ export function MessageInput({ onSend }: MessageInputProps) {
     setText('')
   }
 
-  function handleSubmit(event: FormEvent) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     submit()
   }

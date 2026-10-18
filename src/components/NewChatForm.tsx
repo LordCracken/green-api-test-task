@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { checkAccount } from '../api/greenApi'
 import type { Chat, Credentials } from '../types'
 import { formatPhone, normalizePhone } from '../utils/phone'
@@ -14,7 +14,7 @@ export function NewChatForm({ credentials, onCreate }: NewChatFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const digits = normalizePhone(phone)
     if (!digits) {
