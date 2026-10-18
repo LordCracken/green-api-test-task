@@ -14,9 +14,10 @@ function StatusIcon({ status }: { status: MessageStatus }) {
   switch (status) {
     case 'pending':
       return <ClockIcon width={14} height={14} />
+    // Как в Telegram: одна галочка — отправлено/доставлено, две — прочитано
     case 'sent':
-      return <CheckIcon width={14} height={14} />
     case 'delivered':
+      return <CheckIcon width={14} height={14} />
     case 'read':
       return <DoubleCheckIcon width={17} height={14} />
     case 'failed':
