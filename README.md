@@ -6,7 +6,7 @@
 
 ## Возможности
 
-1. Вход по учётным данным инстанса GREEN-API: `idInstance` и `apiTokenInstance`. Поле `apiUrl` необязательное, по умолчанию `https://api.green-api.com`.
+1. Вход по учётным данным инстанса GREEN-API: `idInstance` и `apiTokenInstance`.
 2. Создание чата по номеру телефона получателя (или по `@username`).
 3. Отправка текстовых сообщений методом [SendMessage](https://green-api.com/telegram/docs/api/sending/SendMessage/).
 4. Получение ответов через [HTTP API](https://green-api.com/telegram/docs/api/receiving/technology-http-api/): `ReceiveNotification` + `DeleteNotification`.
@@ -38,7 +38,7 @@ npm run lint     # ESLint
 3. В настройках инстанса:
    - оставьте **пустым** поле `webhookUrl`. Если адрес вебхука задан, `ReceiveNotification` не работает;
    - включите получение входящих сообщений и статусов исходящих.
-4. Скопируйте из кабинета `idInstance`, `apiTokenInstance` и `apiUrl`.
+4. Скопируйте из кабинета `idInstance` и `apiTokenInstance`.
 
 ## Сценарий проверки
 
@@ -60,6 +60,7 @@ src/
 └── utils/                    # форматирование номеров и дат
 ```
 
+- **Хост API.** У каждого инстанса свой `apiUrl`, и он совпадает с первыми четырьмя цифрами `idInstance` (`4100123456` → `https://4100.api.green-api.com`). Приложение вычисляет его само (`getApiUrl` в `src/api/greenApi.ts`), поэтому пользователь вводит только `idInstance` и `apiTokenInstance`.
 - **Номер → chatId.** Telegram адресует личные чаты числовым `chatId`. При создании чата номер проверяется методом [CheckAccount](https://green-api.com/telegram/docs/api/service/CheckAccount/), и дальше сообщения отправляются и сопоставляются по `chatId`, как рекомендует документация.
 - **Получение.** `useNotifications` в цикле вызывает `receiveNotification` с `receiveTimeout=20`. Каждое уведомление обрабатывается и удаляется через `deleteNotification`, даже если обработать его не удалось, иначе очередь остановится. При ошибке сети цикл повторяется через 5 секунд, а в интерфейсе появляется предупреждение.
 - **Типы уведомлений.** Обрабатываются:

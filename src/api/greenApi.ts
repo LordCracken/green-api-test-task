@@ -10,6 +10,12 @@ export class GreenApiError extends Error {
   }
 }
 
+// Хост API у каждого инстанса свой (в кабинете — поле apiUrl)
+// и совпадает с первыми четырьмя цифрами idInstance: 4100123456 → 4100.api.green-api.com
+export function getApiUrl(idInstance: string): string {
+  return `https://${idInstance.slice(0, 4)}.api.green-api.com`
+}
+
 interface RequestOptions {
   httpMethod?: 'GET' | 'POST' | 'DELETE'
   body?: unknown
@@ -39,7 +45,7 @@ async function request<T>(
   method: string,
   { httpMethod = 'GET', body, pathSuffix = '', query, signal }: RequestOptions = {},
 ): Promise<T> {
-  const base = credentials.apiUrl.trim().replace(/\/+$/, '')
+  const base = getApiUrl(credentials.idInstance)
   const search = query
     ? '?' + new URLSearchParams(Object.entries(query).map(([k, v]) => [k, String(v)]))
     : ''
@@ -55,7 +61,7 @@ async function request<T>(
     })
   } catch (error) {
     if (signal?.aborted) throw error
-    throw new GreenApiError('Не удалось связаться с сервером GREEN-API. Проверьте apiUrl и подключение к сети')
+    throw new GreenApiError('Не удалось связаться с сервером GREEN-API. Проверьте idInstance и подключение к сети')
   }
 
   const text = await response.text()

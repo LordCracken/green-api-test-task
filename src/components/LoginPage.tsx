@@ -3,8 +3,6 @@ import { getStateInstance } from '../api/greenApi'
 import type { Credentials } from '../types'
 import { PaperPlaneIcon } from './icons'
 
-const DEFAULT_API_URL = 'https://api.green-api.com'
-
 const STATE_DESCRIPTIONS: Record<string, string> = {
   notAuthorized:
     'инстанс не авторизован — отсканируйте QR-код в личном кабинете GREEN-API (Telegram → Настройки → Устройства)',
@@ -19,7 +17,6 @@ interface LoginPageProps {
 }
 
 export function LoginPage({ onLogin }: LoginPageProps) {
-  const [apiUrl, setApiUrl] = useState(DEFAULT_API_URL)
   const [idInstance, setIdInstance] = useState('')
   const [apiTokenInstance, setApiTokenInstance] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -28,12 +25,11 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     const credentials: Credentials = {
-      apiUrl: apiUrl.trim() || DEFAULT_API_URL,
       idInstance: idInstance.trim(),
       apiTokenInstance: apiTokenInstance.trim(),
     }
-    if (!/^\d+$/.test(credentials.idInstance)) {
-      setError('idInstance должен состоять из цифр')
+    if (!/^\d{4,}$/.test(credentials.idInstance)) {
+      setError('idInstance должен состоять из цифр — скопируйте его из личного кабинета')
       return
     }
 
@@ -91,17 +87,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             autoComplete="current-password"
             placeholder="Токен инстанса"
             required
-          />
-        </label>
-
-        <label className="field">
-          <span className="field__label">apiUrl</span>
-          <input
-            className="field__input"
-            type="url"
-            value={apiUrl}
-            onChange={(e) => setApiUrl(e.target.value)}
-            placeholder={DEFAULT_API_URL}
           />
         </label>
 
