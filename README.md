@@ -1,75 +1,76 @@
-# React + TypeScript + Vite
+# Чат Telegram на GREEN-API
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Тестовое задание на позицию «Фронтенд-разработчик React» в GREEN-API: простой веб-интерфейс для отправки и получения текстовых сообщений в Telegram. Внешний вид повторяет [web.telegram.org](https://web.telegram.org/).
 
-Currently, two official plugins are available:
+> По ТЗ основной мессенджер — MAX, но разрешена замена на WhatsApp или Telegram. Решение сделано для Telegram.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Возможности
 
-## React Compiler
+1. Вход по учётным данным инстанса GREEN-API: `idInstance` и `apiTokenInstance`. Поле `apiUrl` необязательное, по умолчанию `https://api.green-api.com`.
+2. Создание чата по номеру телефона получателя (или по `@username`).
+3. Отправка текстовых сообщений методом [SendMessage](https://green-api.com/telegram/docs/api/sending/SendMessage/).
+4. Получение ответов через [HTTP API](https://green-api.com/telegram/docs/api/receiving/technology-http-api/): `ReceiveNotification` + `DeleteNotification`.
+5. Статусы исходящих сообщений: отправляется, отправлено, доставлено, прочитано, ошибка.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Быстрый старт
 
-## Expanding the ESLint configuration
+Нужен Node.js 20.19+ или 22.12+.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Приложение откроется на http://localhost:5173.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Другие команды:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build    # проверка типов и production-сборка в dist/
+npm run preview  # просмотр собранной версии
+npm run lint     # ESLint
+```
+
+## Подготовка инстанса GREEN-API
+
+1. Зарегистрируйтесь в [личном кабинете](https://console.green-api.com) и создайте инстанс для Telegram.
+2. Авторизуйте его: в приложении Telegram откройте **Настройки → Устройства → Подключить устройство** и отсканируйте QR-код из кабинета.
+3. В настройках инстанса:
+   - оставьте **пустым** поле `webhookUrl`. Если адрес вебхука задан, `ReceiveNotification` не работает;
+   - включите получение входящих сообщений и статусов исходящих.
+4. Скопируйте из кабинета `idInstance`, `apiTokenInstance` и `apiUrl`.
+
+## Сценарий проверки
+
+1. Откройте приложение и введите `idInstance` и `apiTokenInstance`.
+2. Введите номер получателя в международном формате, например `+7 999 123-45-67`, и нажмите «+».
+3. Напишите сообщение и отправьте его (Enter — отправить, Shift+Enter — перенос строки).
+4. Ответьте с аккаунта получателя в Telegram. Ответ появится в чате.
+
+## Как это устроено
 
 ```
+src/
+├── api/greenApi.ts           # запросы к GREEN-API и разбор ошибок
+├── hooks/useNotifications.ts # цикл получения уведомлений (long polling)
+├── state/
+│   ├── chatReducer.ts        # чаты, сообщения, статусы
+│   └── storage.ts            # сохранение в sessionStorage / localStorage
+├── components/               # LoginPage, Messenger, Sidebar, ChatView и др.
+└── utils/                    # форматирование номеров и дат
+```
+
+- **Номер → chatId.** Telegram адресует личные чаты числовым `chatId`. При создании чата номер проверяется методом [CheckAccount](https://green-api.com/telegram/docs/api/service/CheckAccount/), и дальше сообщения отправляются и сопоставляются по `chatId`, как рекомендует документация.
+- **Получение.** `useNotifications` в цикле вызывает `receiveNotification` с `receiveTimeout=20`. Каждое уведомление обрабатывается и удаляется через `deleteNotification`, даже если обработать его не удалось, иначе очередь остановится. При ошибке сети цикл повторяется через 5 секунд, а в интерфейсе появляется предупреждение.
+- **Типы уведомлений.** Обрабатываются:
+  - `incomingMessageReceived` — входящие;
+  - `outgoingMessageReceived` — сообщения, отправленные с телефона;
+  - `outgoingMessageStatus` — статусы доставки.
+
+  Учитываются текстовые типы `textMessage` и `extendedTextMessage`.
+- **Отправка.** Сообщение сразу появляется в чате со статусом «отправляется». После ответа API оно получает настоящий `idMessage`, к которому дальше привязываются статусы доставки.
+- **Хранение.** Учётные данные лежат в `sessionStorage` и удаляются при закрытии вкладки. История чатов хранится в `localStorage` отдельно для каждого инстанса.
+
+## Стек
+
+React 19, TypeScript, Vite. Сторонних UI-библиотек и библиотек состояния нет: функциональность минимальна, и встроенного `useReducer` достаточно.
