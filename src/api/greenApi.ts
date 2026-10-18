@@ -1,15 +1,5 @@
 import type { Credentials } from '../types'
 
-export class GreenApiError extends Error {
-  readonly status?: number
-
-  constructor(message: string, status?: number) {
-    super(message)
-    this.name = 'GreenApiError'
-    this.status = status
-  }
-}
-
 // Хост API у каждого инстанса свой (в кабинете — поле apiUrl)
 // и совпадает с первыми четырьмя цифрами idInstance: 4100123456 → 4100.api.green-api.com
 export function getApiUrl(idInstance: string): string {
@@ -61,12 +51,15 @@ async function request<T>(
     })
   } catch (error) {
     if (signal?.aborted) throw error
-    throw new GreenApiError('Не удалось связаться с сервером GREEN-API. Проверьте idInstance и подключение к сети')
+    throw new Error(
+      'Не удалось связаться с сервером GREEN-API. Проверьте idInstance и подключение к сети',
+      { cause: error },
+    )
   }
 
   const text = await response.text()
   if (!response.ok) {
-    throw new GreenApiError(describeError(response.status, text), response.status)
+    throw new Error(describeError(response.status, text))
   }
   return (text ? JSON.parse(text) : null) as T
 }
@@ -97,7 +90,7 @@ export async function checkAccount(credentials: Credentials, phoneNumber: string
   })
   if ('status' in result && result.status === false) {
     const reason = result.reason ?? result.data?.reason ?? ''
-    throw new GreenApiError(CHECK_ACCOUNT_REASONS[reason] ?? (reason || 'Не удалось проверить аккаунт'))
+    throw new Error(CHECK_ACCOUNT_REASONS[reason] ?? (reason || 'Не удалось проверить аккаунт'))
   }
   return result as Extract<CheckAccountResponse, { exist: boolean }>
 }
