@@ -2,6 +2,8 @@
 
 Тестовое задание на позицию «Фронтенд-разработчик React» в GREEN-API: простой веб-интерфейс для отправки и получения текстовых сообщений в Telegram. Внешний вид повторяет [web.telegram.org](https://web.telegram.org/).
 
+**Демо:** https://lordcracken.github.io/green-api-test-task/
+
 > По ТЗ основной мессенджер — MAX, но разрешена замена на WhatsApp или Telegram. Решение сделано для Telegram.
 
 ## Возможности
