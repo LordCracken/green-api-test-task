@@ -59,7 +59,6 @@ export function Messenger({ credentials, onLogout }: MessengerProps) {
         const incoming = body.typeWebhook === 'incomingMessageReceived'
         dispatch({
           type: 'addMessage',
-          chatName: body.senderData.chatName || body.senderData.senderName,
           message: {
             id: body.idMessage,
             chatId: body.senderData.chatId,

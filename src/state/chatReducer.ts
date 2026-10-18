@@ -9,7 +9,7 @@ export interface ChatState {
 export type ChatAction =
   | { type: 'openChat'; chat: Chat }
   | { type: 'selectChat'; chatId: string | null }
-  | { type: 'addMessage'; message: Message; chatName?: string }
+  | { type: 'addMessage'; message: Message }
   | { type: 'confirmMessage'; chatId: string; localId: string; id: string }
   | { type: 'failMessage'; chatId: string; localId: string; error: string }
   | { type: 'setStatus'; chatId: string; id: string; status: MessageStatus; error?: string }
@@ -59,15 +59,12 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
 
     case 'addMessage': {
       const { message } = action
+      // Чаты создаёт только пользователь — сообщения из остальных чатов Telegram не показываем
+      if (!state.chats.some((c) => c.id === message.chatId)) return state
       const list = state.messages[message.chatId] ?? []
       if (list.some((m) => m.id === message.id)) return state
       return {
         ...state,
-        chats: ensureChat(state.chats, {
-          id: message.chatId,
-          name: action.chatName || message.chatId,
-          createdAt: message.timestamp,
-        }),
         messages: { ...state.messages, [message.chatId]: [...list, message] },
       }
     }

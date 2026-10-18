@@ -120,8 +120,6 @@ export interface NotificationBody {
   description?: string
   senderData?: {
     chatId: string
-    chatName?: string
-    senderName?: string
   }
   messageData?: {
     typeMessage: string
